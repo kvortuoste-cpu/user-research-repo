@@ -1,0 +1,170 @@
+/* Air Canada design system — fonts & tokens extracted from shared-library-angular */
+
+/* ── Fonts ─────────────────────────────────────────────────────────────────── */
+
+@font-face {
+  font-family: "Open Sans";
+  src: url("/fonts/open-sans/OpenSans-Regular.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Open Sans";
+  src: url("/fonts/open-sans/OpenSans-SemiBold.woff2") format("woff2");
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Open Sans";
+  src: url("/fonts/open-sans/OpenSans-Bold.woff2") format("woff2");
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "AC Nord";
+  src: url("/fonts/ac-nord/AC_Nord_Display-Regular.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "AC Nord";
+  src: url("/fonts/ac-nord/AC_Nord_Display-Medium.woff2") format("woff2");
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "AC Nord";
+  src: url("/fonts/ac-nord/AC_Nord_Display-Bold.woff2") format("woff2");
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* ── Design tokens ─────────────────────────────────────────────────────────── */
+/* Resolved from ac-core primitives + semantic-colours-light-mode               */
+
+:root {
+  /* Font families */
+  --ac-font-family-text: "Open Sans", sans-serif;
+  --ac-font-family-display: "AC Nord", "Open Sans", sans-serif;
+
+  /* Font weights */
+  --ac-font-weight-regular: 400;
+  --ac-font-weight-semi-bold: 600;
+  --ac-font-weight-bold: 700;
+
+  /* ── Colour primitives ── */
+  /* Blue */
+  --ac-blue-400: #1460aa;
+  --ac-blue-500: #034b91;
+  --ac-blue-600: #003d78;
+  --ac-blue-800: #002345;
+
+  /* Red (brand) */
+  --ac-red-0: #f01428;
+  --ac-red-300: #ff333a;
+  --ac-red-400: #d8292f;
+
+  /* Neutral */
+  --ac-neutral-25: #fff;
+  --ac-neutral-50: #f9f9f9;
+  --ac-neutral-75: #f6f6f6;
+  --ac-neutral-100: #eff0f2;
+  --ac-neutral-200: #e2e3e5;
+  --ac-neutral-300: #d6d7d9;
+  --ac-neutral-400: #c9cacc;
+  --ac-neutral-500: #a3a4a6;
+  --ac-neutral-600: #6d6d6f;
+  --ac-neutral-700: #333;
+  --ac-neutral-900: #000;
+
+  /* ── Semantic colour tokens ── */
+
+  /* Border */
+  --colour-border-primary: #1460aa;
+  --colour-border-primary-hover: #003d78;
+  --colour-border-primary-pressed: #002345;
+  --colour-border-secondary: #c9cacc;
+  --colour-border-tertiary: #333;
+  --colour-border-divider: #e2e3e5;
+  --colour-border-disabled: #e2e3e5;
+  --colour-border-error: #9e231b;
+  --colour-border-warning: #cc8800;
+  --colour-border-success: #20842f;
+  --colour-border-inverse: #fff;
+
+  /* Background fills */
+  --colour-bg-fill-primary: #1460aa;
+  --colour-bg-fill-primary-hover: #003d78;
+  --colour-bg-fill-primary-pressed: #002345;
+  --colour-bg-fill-secondary: #fff;
+  --colour-bg-fill-secondary-hover: #f9f9f9;
+  --colour-bg-fill-secondary-pressed: #eff0f2;
+  --colour-bg-fill-tertiary: #f6f6f6;
+  --colour-bg-fill-tertiary-hover: #e2e3e5;
+  --colour-bg-fill-alt: #eff0f2;
+  --colour-bg-fill-brand-primary: #d8292f;
+  --colour-bg-fill-brand-secondary: #ff333a;
+  --colour-bg-fill-brand-tertiary: #000;
+  --colour-bg-fill-brand-quaternary: #fff;
+  --colour-bg-fill-error: #feedec;
+  --colour-bg-fill-warning: #fff7cc;
+  --colour-bg-fill-success: #edf5ee;
+  --colour-bg-fill-information: #f1f7fb;
+  --colour-bg-fill-nav: #fff;
+  --colour-bg-primary: #fff;
+  --colour-bg-secondary: #f9f9f9;
+  --colour-bg-tertiary: #f6f6f6;
+
+  /* Text */
+  --colour-text-primary: #000;
+  --colour-text-secondary: #6d6d6f;
+  --colour-text-tertiary: #e2e3e5;
+  --colour-text-label: #1460aa;
+  --colour-text-label-hover: #003d78;
+  --colour-text-link: #1460aa;
+  --colour-text-inverse: #fff;
+  --colour-text-brand: #d8292f;
+  --colour-text-error: #851109;
+  --colour-text-primary-disabled: #a3a4a6;
+
+  /* Icons */
+  --colour-icon-primary: #1460aa;
+  --colour-icon-secondary: #000;
+  --colour-icon-tertiary: #c9cacc;
+  --colour-icon-inverse: #fff;
+  --colour-icon-brand-primary: #d8292f;
+  --colour-icon-error: #9e231b;
+  --colour-icon-success: #439943;
+  --colour-icon-warning: #cc8800;
+
+  /* Spacing */
+  --spacing-000: 0px;
+  --spacing-025: 2px;
+  --spacing-050: 4px;
+  --spacing-100: 8px;
+  --spacing-150: 12px;
+  --spacing-200: 16px;
+  --spacing-300: 24px;
+  --spacing-400: 32px;
+  --spacing-500: 40px;
+  --spacing-600: 48px;
+  --spacing-800: 64px;
+  --spacing-1000: 80px;
+
+  /* Radii */
+  --radius-025: 4px;
+  --radius-050: 8px;
+  --radius-100: 16px;
+  --radius-full: 999px;
+}

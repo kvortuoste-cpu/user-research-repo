@@ -3,11 +3,12 @@
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { useLiveQuery } from "dexie-react-hooks";
-import { ChevronRight } from "lucide-react";
+import { ChevronRight, Calendar, User } from "lucide-react";
 import { db } from "@/lib/db";
 import { UploadSession } from "@/components/UploadSession";
 import { SessionList } from "@/components/SessionList";
 import { AskAI } from "@/components/AskAI";
+import { EditProject } from "@/components/EditProject";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 export default function ProjectPage() {
@@ -50,11 +51,37 @@ export default function ProjectPage() {
         <span className="text-neutral-900 font-medium">{project.name}</span>
       </nav>
 
-      <div className="mb-8">
-        <h1 className="text-2xl font-semibold tracking-tight">{project.name}</h1>
-        {project.description && (
-          <p className="text-sm text-neutral-600 mt-1">{project.description}</p>
-        )}
+      <div className="mb-8 flex items-start justify-between gap-4 flex-wrap">
+        <div className="space-y-2 min-w-0">
+          <h1 className="text-2xl font-semibold tracking-tight">{project.name}</h1>
+          {project.description && (
+            <p className="text-sm text-neutral-600">{project.description}</p>
+          )}
+          <div className="flex items-center gap-4 text-xs text-neutral-600 flex-wrap">
+            <div className="flex items-center gap-1.5">
+              <Calendar className="h-3 w-3 text-neutral-400" />
+              <span>
+                Created {new Date(project.createdAt).toLocaleDateString(undefined, {
+                  year: "numeric",
+                  month: "short",
+                  day: "numeric",
+                })}
+              </span>
+            </div>
+            {project.owner ? (
+              <div className="flex items-center gap-1.5">
+                <User className="h-3 w-3 text-neutral-400" />
+                <span>{project.owner}</span>
+              </div>
+            ) : (
+              <div className="flex items-center gap-1.5 text-neutral-400 italic">
+                <User className="h-3 w-3" />
+                <span>No owner</span>
+              </div>
+            )}
+          </div>
+        </div>
+        <EditProject project={project} />
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-[1fr_400px] gap-6">

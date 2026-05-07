@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Loader2, Pencil, Lock } from "lucide-react";
+import { Loader2, Pencil } from "lucide-react";
 import { toast } from "sonner";
 import { db, type Project } from "@/lib/db";
 import { Button } from "@/components/ui/button";
@@ -11,7 +11,6 @@ import { Label } from "@/components/ui/label";
 import {
   Dialog,
   DialogContent,
-  DialogDescription,
   DialogFooter,
   DialogHeader,
   DialogTitle,
@@ -26,24 +25,13 @@ export function EditProject({ project }: Props) {
   const [open, setOpen] = useState(false);
   const [name, setName] = useState(project.name);
   const [description, setDescription] = useState(project.description ?? "");
-  const [owner, setOwner] = useState(project.owner ?? "");
+  const [conductedBy, setConductedBy] = useState(project.conductedBy ?? "");
   const [saving, setSaving] = useState(false);
-
-  const isLocked = !!project.owner;
-
-  if (isLocked) {
-    return (
-      <div className="flex items-center gap-1.5 text-xs text-neutral-500">
-        <Lock className="h-3.5 w-3.5" />
-        <span>Locked by {project.owner}</span>
-      </div>
-    );
-  }
 
   function reset() {
     setName(project.name);
     setDescription(project.description ?? "");
-    setOwner(project.owner ?? "");
+    setConductedBy(project.conductedBy ?? "");
   }
 
   async function handleSave(e: React.FormEvent) {
@@ -54,7 +42,7 @@ export function EditProject({ project }: Props) {
       await db.projects.update(project.id, {
         name: name.trim(),
         description: description.trim() || undefined,
-        owner: owner.trim() || undefined,
+        conductedBy: conductedBy.trim() || undefined,
       });
       toast.success("Project updated");
       setOpen(false);
@@ -82,10 +70,6 @@ export function EditProject({ project }: Props) {
       <DialogContent>
         <DialogHeader>
           <DialogTitle>Edit project</DialogTitle>
-          <DialogDescription>
-            Update the project details. Setting an owner will lock the project
-            from further edits.
-          </DialogDescription>
         </DialogHeader>
         <form onSubmit={handleSave} className="space-y-4">
           <div className="space-y-1.5">
@@ -107,18 +91,13 @@ export function EditProject({ project }: Props) {
             />
           </div>
           <div className="space-y-1.5">
-            <Label htmlFor="edit-owner">Owner / Conducted by</Label>
+            <Label htmlFor="edit-conducted-by">Conducted by</Label>
             <Input
-              id="edit-owner"
-              value={owner}
-              onChange={(e) => setOwner(e.target.value)}
-              placeholder="Leave blank to keep the project open for editing"
+              id="edit-conducted-by"
+              value={conductedBy}
+              onChange={(e) => setConductedBy(e.target.value)}
+              placeholder="e.g. Kiefer Ortuoste"
             />
-            {owner.trim() && (
-              <p className="text-xs text-amber-600">
-                ⚠ Adding an owner will lock this project from further edits.
-              </p>
-            )}
           </div>
           <DialogFooter>
             <Button type="submit" disabled={saving || !name.trim()}>

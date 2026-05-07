@@ -68,15 +68,15 @@ export default function ProjectPage() {
                 })}
               </span>
             </div>
-            {project.owner ? (
+            {project.conductedBy ? (
               <div className="flex items-center gap-1.5">
                 <User className="h-3 w-3 text-neutral-400" />
-                <span>{project.owner}</span>
+                <span>Conducted by {project.conductedBy}</span>
               </div>
             ) : (
               <div className="flex items-center gap-1.5 text-neutral-400 italic">
                 <User className="h-3 w-3" />
-                <span>No owner</span>
+                <span>Conducted by — unspecified</span>
               </div>
             )}
           </div>

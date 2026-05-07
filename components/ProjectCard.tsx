@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useLiveQuery } from "dexie-react-hooks";
-import { Lock, User, Calendar } from "lucide-react";
+import { User, Calendar } from "lucide-react";
 import { db, type Project } from "@/lib/db";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
@@ -24,17 +24,9 @@ export function ProjectCard({ project }: Props) {
     <Link href={`/projects/${project.id}`} className="block group">
       <Card className="hover:border-blue-400 transition-colors h-full">
         <CardHeader>
-          <div className="flex items-start justify-between gap-2">
-            <CardTitle className="text-base group-hover:text-blue-600">
-              {project.name}
-            </CardTitle>
-            {project.owner && (
-              <Lock
-                className="h-3.5 w-3.5 text-neutral-400 shrink-0 mt-1"
-                aria-label="Locked"
-              />
-            )}
-          </div>
+          <CardTitle className="text-base group-hover:text-blue-600">
+            {project.name}
+          </CardTitle>
         </CardHeader>
         <CardContent className="space-y-3">
           {project.description ? (
@@ -55,15 +47,17 @@ export function ProjectCard({ project }: Props) {
                 })}
               </span>
             </div>
-            {project.owner ? (
+            {project.conductedBy ? (
               <div className="flex items-center gap-1.5">
                 <User className="h-3 w-3 text-neutral-400" />
-                <span className="truncate">{project.owner}</span>
+                <span className="truncate">
+                  Conducted by {project.conductedBy}
+                </span>
               </div>
             ) : (
               <div className="flex items-center gap-1.5 text-neutral-400 italic">
                 <User className="h-3 w-3" />
-                <span>No owner</span>
+                <span>Conducted by — unspecified</span>
               </div>
             )}
             <div className="text-neutral-500">

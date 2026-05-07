@@ -4,7 +4,7 @@ export interface Project {
   id?: number;
   name: string;
   description?: string;
-  owner?: string;
+  conductedBy?: string;
   createdAt: Date;
 }
 

@@ -14,7 +14,7 @@ export function CreateProject() {
   const [open, setOpen] = useState(false);
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
-  const [owner, setOwner] = useState("");
+  const [conductedBy, setConductedBy] = useState("");
   const [saving, setSaving] = useState(false);
 
   async function handleSubmit(e: React.FormEvent) {
@@ -25,12 +25,12 @@ export function CreateProject() {
       await db.projects.add({
         name: name.trim(),
         description: description.trim() || undefined,
-        owner: owner.trim() || undefined,
+        conductedBy: conductedBy.trim() || undefined,
         createdAt: new Date(),
       });
       setName("");
       setDescription("");
-      setOwner("");
+      setConductedBy("");
       setOpen(false);
       toast.success("Project created");
     } catch (err) {
@@ -80,16 +80,13 @@ export function CreateProject() {
             />
           </div>
           <div className="space-y-1.5">
-            <Label htmlFor="project-owner">Owner / Conducted by (optional)</Label>
+            <Label htmlFor="project-conducted-by">Conducted by (optional)</Label>
             <Input
-              id="project-owner"
-              value={owner}
-              onChange={(e) => setOwner(e.target.value)}
+              id="project-conducted-by"
+              value={conductedBy}
+              onChange={(e) => setConductedBy(e.target.value)}
               placeholder="e.g. Kiefer Ortuoste"
             />
-            <p className="text-xs text-neutral-500">
-              Setting an owner locks this project from being edited by others.
-            </p>
           </div>
           <div className="flex gap-2">
             <Button type="submit" disabled={saving || !name.trim()}>
@@ -102,7 +99,7 @@ export function CreateProject() {
                 setOpen(false);
                 setName("");
                 setDescription("");
-                setOwner("");
+                setConductedBy("");
               }}
             >
               Cancel

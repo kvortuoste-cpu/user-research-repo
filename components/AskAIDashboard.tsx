@@ -8,28 +8,26 @@ import { db } from "@/lib/db";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 
-interface Props {
-  projectId: number;
-  className?: string;
-}
+const DASHBOARD_PROJECT_ID = 0;
 
 const SUGGESTED_PROMPTS = [
-  "What are the top pain points?",
-  "What features were most requested?",
-  "How do users feel about onboarding?",
-  "What surprised you most in the data?",
+  "What insights appear across multiple projects?",
+  "Which project has the most validated insights?",
+  "What patterns do you see in participant feedback?",
+  "What are the most common pain points?",
 ];
 
-export function AskAI({ projectId, className }: Props) {
+export function AskAIDashboard() {
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
+
   const messages = useLiveQuery(
     () =>
       db.askAIMessages
         .where("projectId")
-        .equals(projectId)
+        .equals(DASHBOARD_PROJECT_ID)
         .sortBy("createdAt"),
-    [projectId],
+    [],
   );
 
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -43,39 +41,82 @@ export function AskAI({ projectId, className }: Props) {
 
     setLoading(true);
     setInput("");
+
     try {
       await db.askAIMessages.add({
-        projectId,
+        projectId: DASHBOARD_PROJECT_ID,
         role: "user",
         content: trimmed,
         createdAt: new Date(),
       });
 
-      const sessions = await db.sessions
-        .where("projectId")
-        .equals(projectId)
-        .toArray();
+      const projects = await db.projects.orderBy("createdAt").toArray();
 
-      if (sessions.length === 0) {
+      if (projects.length === 0) {
         await db.askAIMessages.add({
-          projectId,
+          projectId: DASHBOARD_PROJECT_ID,
           role: "assistant",
           content:
-            "There are no sessions in this project yet. Upload some transcripts first and I'll analyze them.",
+            "No projects found yet. Create some projects and upload sessions to get cross-project insights.",
           createdAt: new Date(),
         });
         return;
       }
 
-      const transcripts = sessions.map(
-        (s) => `Title: ${s.title}\n\n${s.transcript}`,
+      const projectSummaries = await Promise.all(
+        projects.map(async (p) => {
+          const sessions = await db.sessions
+            .where("projectId")
+            .equals(p.id!)
+            .toArray();
+
+          const keyFindings = sessions
+            .slice()
+            .reverse()
+            .flatMap((s) => s.keyFindings ?? [])
+            .slice(0, 10);
+
+          const participantCount = sessions.filter(
+            (s) => s.participantInfo,
+          ).length;
+
+          const sorted = sessions
+            .map((s) => s.createdAt)
+            .sort((a, b) => +a - +b);
+          const fmt = (d: Date) =>
+            d.toLocaleDateString(undefined, {
+              month: "short",
+              day: "numeric",
+              year: "numeric",
+            });
+          const dateRange =
+            sorted.length > 0
+              ? sorted.length === 1
+                ? fmt(sorted[0])
+                : `${fmt(sorted[0])} – ${fmt(sorted[sorted.length - 1])}`
+              : "No sessions";
+
+          return {
+            name: p.name,
+            description: p.description,
+            sessionCount: sessions.length,
+            participantCount,
+            dateRange,
+            keyFindings,
+          };
+        }),
       );
 
       const res = await fetch("/api/analyze", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ type: "ask", query: trimmed, transcripts }),
+        body: JSON.stringify({
+          type: "ask-cross-project",
+          query: trimmed,
+          projectSummaries,
+        }),
       });
+
       if (!res.ok) {
         const data = (await res.json().catch(() => ({}))) as { error?: string };
         throw new Error(data.error || `Request failed (${res.status})`);
@@ -83,7 +124,7 @@ export function AskAI({ projectId, className }: Props) {
       const data = (await res.json()) as { answer: string };
 
       await db.askAIMessages.add({
-        projectId,
+        projectId: DASHBOARD_PROJECT_ID,
         role: "assistant",
         content: data.answer,
         createdAt: new Date(),
@@ -92,7 +133,7 @@ export function AskAI({ projectId, className }: Props) {
       const msg = err instanceof Error ? err.message : "Something went wrong";
       toast.error(msg);
       await db.askAIMessages.add({
-        projectId,
+        projectId: DASHBOARD_PROJECT_ID,
         role: "assistant",
         content: `Sorry, I hit an error: ${msg}`,
         createdAt: new Date(),
@@ -108,12 +149,12 @@ export function AskAI({ projectId, className }: Props) {
   }
 
   return (
-    <div className={`flex flex-col h-full bg-white border rounded-lg overflow-hidden${className ? ` ${className}` : ""}`}>
-      <div className="px-4 py-3 border-b flex items-center gap-2">
-        <Sparkles className="h-4 w-4 text-blue-600" />
+    <div className="flex flex-col h-[360px] bg-white border rounded-lg overflow-hidden">
+      <div className="px-4 py-3 border-b flex items-center gap-2 shrink-0">
+        <Sparkles className="h-4 w-4 text-[var(--ac-blue-400)]" />
         <h2 className="text-sm font-semibold">Ask AI</h2>
         <span className="text-xs text-neutral-500 ml-auto">
-          Synthesizes across all sessions
+          Synthesizes across all projects
         </span>
       </div>
 
@@ -121,7 +162,7 @@ export function AskAI({ projectId, className }: Props) {
         {messages === undefined || messages.length === 0 ? (
           <div className="space-y-3">
             <p className="text-sm text-neutral-600">
-              Ask a question across every session in this project. Try:
+              Ask anything across your entire research portfolio. Try:
             </p>
             <div className="flex flex-col gap-2">
               {SUGGESTED_PROMPTS.map((p) => (
@@ -146,7 +187,7 @@ export function AskAI({ projectId, className }: Props) {
               <div
                 className={`max-w-[85%] px-3 py-2 rounded-lg text-sm whitespace-pre-wrap ${
                   m.role === "user"
-                    ? "bg-blue-600 text-white"
+                    ? "bg-[var(--primary)] text-white"
                     : "bg-neutral-100 text-neutral-900"
                 }`}
               >
@@ -165,7 +206,7 @@ export function AskAI({ projectId, className }: Props) {
         )}
       </div>
 
-      <form onSubmit={handleSubmit} className="border-t p-3 flex gap-2">
+      <form onSubmit={handleSubmit} className="border-t p-3 flex gap-2 shrink-0">
         <Textarea
           value={input}
           onChange={(e) => setInput(e.target.value)}
@@ -175,7 +216,7 @@ export function AskAI({ projectId, className }: Props) {
               send(input);
             }
           }}
-          placeholder="Ask something..."
+          placeholder="Ask something across all projects..."
           rows={2}
           className="resize-none text-sm"
           disabled={loading}

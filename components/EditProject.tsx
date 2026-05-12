@@ -1,21 +1,10 @@
 "use client";
 
-import { useState } from "react";
-import { Loader2, Pencil } from "lucide-react";
+import { useRef, useState } from "react";
+import { Pencil } from "lucide-react";
 import { toast } from "sonner";
 import { db, type Project } from "@/lib/db";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { Label } from "@/components/ui/label";
-import {
-  Dialog,
-  DialogContent,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
+import { Button, Dialog, FormControl, Spinner, TextInput, Textarea } from "@primer/react";
 
 interface Props {
   project: Project;
@@ -27,11 +16,17 @@ export function EditProject({ project }: Props) {
   const [description, setDescription] = useState(project.description ?? "");
   const [conductedBy, setConductedBy] = useState(project.conductedBy ?? "");
   const [saving, setSaving] = useState(false);
+  const triggerRef = useRef<HTMLButtonElement>(null);
 
   function reset() {
     setName(project.name);
     setDescription(project.description ?? "");
     setConductedBy(project.conductedBy ?? "");
+  }
+
+  function handleClose() {
+    setOpen(false);
+    reset();
   }
 
   async function handleSave(e: React.FormEvent) {
@@ -54,58 +49,76 @@ export function EditProject({ project }: Props) {
   }
 
   return (
-    <Dialog
-      open={open}
-      onOpenChange={(o) => {
-        setOpen(o);
-        if (!o) reset();
-      }}
-    >
-      <DialogTrigger asChild>
-        <Button variant="outline" size="sm">
-          <Pencil className="h-3.5 w-3.5" />
-          Edit
-        </Button>
-      </DialogTrigger>
-      <DialogContent>
-        <DialogHeader>
-          <DialogTitle>Edit project</DialogTitle>
-        </DialogHeader>
-        <form onSubmit={handleSave} className="space-y-4">
-          <div className="space-y-1.5">
-            <Label htmlFor="edit-name">Name</Label>
-            <Input
-              id="edit-name"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              required
-            />
-          </div>
-          <div className="space-y-1.5">
-            <Label htmlFor="edit-description">Description</Label>
-            <Textarea
-              id="edit-description"
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              rows={3}
-            />
-          </div>
-          <div className="space-y-1.5">
-            <Label htmlFor="edit-conducted-by">Conducted by</Label>
-            <Input
-              id="edit-conducted-by"
-              value={conductedBy}
-              onChange={(e) => setConductedBy(e.target.value)}
-              placeholder="e.g. Kiefer Ortuoste"
-            />
-          </div>
-          <DialogFooter>
-            <Button type="submit" disabled={saving || !name.trim()}>
-              {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : "Save"}
+    <>
+      <Button
+        ref={triggerRef}
+        variant="default"
+        size="small"
+        onClick={() => setOpen(true)}
+        leadingVisual={() => <Pencil className="h-3.5 w-3.5" />}
+      >
+        Edit
+      </Button>
+
+      {open && (
+      <Dialog
+        returnFocusRef={triggerRef}
+        onClose={handleClose}
+        title="Edit project"
+      >
+        <div className="p-4">
+          <form id="edit-project-form" onSubmit={handleSave} className="flex flex-col gap-4">
+            <FormControl required>
+              <FormControl.Label>Name</FormControl.Label>
+              <TextInput
+                block
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+              />
+            </FormControl>
+            <FormControl>
+              <FormControl.Label>
+                Description{" "}
+                <span className="text-[#6d6d6f] font-normal">(optional)</span>
+              </FormControl.Label>
+              <Textarea
+                block
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+                rows={3}
+              />
+            </FormControl>
+            <FormControl>
+              <FormControl.Label>
+                Conducted by{" "}
+                <span className="text-[#6d6d6f] font-normal">(optional)</span>
+              </FormControl.Label>
+              <TextInput
+                block
+                value={conductedBy}
+                onChange={(e) => setConductedBy(e.target.value)}
+                placeholder="e.g. Kiefer Ortuoste"
+              />
+            </FormControl>
+          </form>
+        </div>
+        <Dialog.Footer>
+          <div className="flex gap-2 justify-end">
+            <Button variant="default" onClick={handleClose} disabled={saving}>
+              Cancel
             </Button>
-          </DialogFooter>
-        </form>
-      </DialogContent>
-    </Dialog>
+            <Button
+              type="submit"
+              form="edit-project-form"
+              variant="primary"
+              disabled={saving || !name.trim()}
+            >
+              {saving ? <Spinner size="small" /> : "Save"}
+            </Button>
+          </div>
+        </Dialog.Footer>
+      </Dialog>
+      )}
+    </>
   );
 }

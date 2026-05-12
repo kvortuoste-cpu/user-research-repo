@@ -1,14 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { Plus } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
+import { Button, Dialog } from "@primer/react";
 import { UploadSession } from "@/components/UploadSession";
 
 interface Props {
@@ -17,25 +11,31 @@ interface Props {
 
 export function NewSessionModal({ projectId }: Props) {
   const [open, setOpen] = useState(false);
+  const triggerRef = useRef<HTMLButtonElement>(null);
 
   return (
     <>
-      <Button onClick={() => setOpen(true)}>
-        <Plus className="h-4 w-4" />
+      <Button
+        ref={triggerRef}
+        variant="primary"
+        onClick={() => setOpen(true)}
+        leadingVisual={() => <Plus className="h-4 w-4" />}
+      >
         New Session
       </Button>
 
-      <Dialog open={open} onOpenChange={setOpen}>
-        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle>Add a New Session</DialogTitle>
-          </DialogHeader>
-          <UploadSession
-            projectId={projectId}
-            onSuccess={() => setOpen(false)}
-          />
-        </DialogContent>
-      </Dialog>
+      {open && (
+        <Dialog
+          returnFocusRef={triggerRef}
+          onClose={() => setOpen(false)}
+          title="Add a New Session"
+          width="xlarge"
+        >
+          <Dialog.Body>
+            <UploadSession projectId={projectId} onSuccess={() => setOpen(false)} />
+          </Dialog.Body>
+        </Dialog>
+      )}
     </>
   );
 }

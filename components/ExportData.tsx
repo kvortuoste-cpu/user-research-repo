@@ -1,10 +1,10 @@
 "use client";
 
 import { useState } from "react";
-import { Download, Loader2 } from "lucide-react";
+import { Download } from "lucide-react";
 import { toast } from "sonner";
 import { db } from "@/lib/db";
-import { Button } from "@/components/ui/button";
+import { Button } from "@primer/react";
 
 export function ExportData() {
   const [busy, setBusy] = useState(false);
@@ -43,13 +43,14 @@ export function ExportData() {
   }
 
   return (
-    <Button variant="outline" size="sm" onClick={handleExport} disabled={busy}>
-      {busy ? (
-        <Loader2 className="h-4 w-4 animate-spin" />
-      ) : (
-        <Download className="h-4 w-4" />
-      )}
-      Export all data
+    <Button
+      variant="default"
+      size="small"
+      onClick={handleExport}
+      disabled={busy}
+      leadingVisual={() => <Download className="h-3.5 w-3.5" />}
+    >
+      {busy ? "Exporting..." : "Export all data"}
     </Button>
   );
 }

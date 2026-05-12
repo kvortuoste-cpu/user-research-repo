@@ -6,7 +6,7 @@ import { db, type Sentiment } from "@/lib/db";
 import { filterSessions, uniqueTags } from "@/lib/search";
 import { SessionCard } from "./SessionCard";
 import { SearchBar } from "./SearchBar";
-import { Skeleton } from "@/components/ui/skeleton";
+import { SkeletonBox } from "@primer/react";
 
 interface Props {
   projectId: number;
@@ -54,21 +54,19 @@ export function SessionList({ projectId }: Props) {
 
   if (sessions === undefined) {
     return (
-      <div className="space-y-3">
-        <Skeleton className="h-10" />
-        <Skeleton className="h-24" />
-        <Skeleton className="h-24" />
+      <div className="flex flex-col gap-3">
+        <SkeletonBox height="40px" />
+        <SkeletonBox height="96px" />
+        <SkeletonBox height="96px" />
       </div>
     );
   }
 
   return (
-    <div className="space-y-4">
-      <div className="flex items-center justify-between">
-        <h2 className="text-sm font-semibold text-neutral-700">
-          Sessions ({sessions.length})
-        </h2>
-      </div>
+    <div className="flex flex-col gap-4">
+      <span className="text-sm font-semibold text-[#6d6d6f]">
+        Sessions ({sessions.length})
+      </span>
 
       <SearchBar
         query={query}
@@ -82,15 +80,15 @@ export function SessionList({ projectId }: Props) {
       />
 
       {sessions.length === 0 ? (
-        <div className="text-center py-10 text-sm text-neutral-500 border-2 border-dashed rounded-lg">
+        <div className="text-center py-10 text-sm text-[#6d6d6f] border-2 border-dashed border-[#e2e3e5] rounded-lg">
           No sessions yet. Upload your first transcript above.
         </div>
       ) : filtered.length === 0 ? (
-        <div className="text-center py-10 text-sm text-neutral-500">
+        <div className="text-center py-10 text-sm text-[#6d6d6f]">
           No sessions match these filters.
         </div>
       ) : (
-        <div className="space-y-3">
+        <div className="flex flex-col gap-3">
           {filtered.map((s) => (
             <SessionCard
               key={s.id}

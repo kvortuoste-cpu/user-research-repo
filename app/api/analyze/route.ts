@@ -8,6 +8,7 @@ const MODEL = "claude-sonnet-4-5";
 interface AnalyzeBody {
   type: "analyze";
   transcript: string;
+  attachmentTexts?: string[];
 }
 
 interface AskBody {
@@ -50,14 +51,24 @@ export async function POST(req: Request) {
 
   try {
     if (body.type === "analyze") {
-      const truncated = body.transcript.substring(0, 6000);
+      const truncated = body.transcript.substring(0, 5000);
+      const attachmentSection = (body.attachmentTexts ?? [])
+        .map((t, i) => `[Attachment ${i + 1}]\n${t.substring(0, 2000)}`)
+        .join("\n\n");
+      const fullContext = [
+        truncated && `Transcript:\n${truncated}`,
+        attachmentSection && `Attachments:\n${attachmentSection}`,
+      ]
+        .filter(Boolean)
+        .join("\n\n---\n\n");
+
       const msg = await client.messages.create({
         model: MODEL,
         max_tokens: 1024,
         messages: [
           {
             role: "user",
-            content: `You are a senior UX research analyst. Analyze this research session transcript and return a JSON object.
+            content: `You are a senior UX research analyst. Analyze this research session content and return a JSON object.
 
 Return ONLY valid JSON. No markdown, no explanation, just the raw JSON object.
 
@@ -74,9 +85,10 @@ Rules:
 - keyFindings: 3-5 items, each a standalone insight a PM or designer could act on
 - tags: 5-8 lowercase tags from this list or similar: pain_point, feature_request, onboarding, navigation, trust, confusion, delight, workaround, expectation_gap, competitor_mention, pricing, performance
 - sentiment: overall emotional tone of the participant
+- Use ALL provided content (transcript + any attachments) to form your analysis
 
-Transcript:
-${truncated}`,
+Session content:
+${fullContext}`,
           },
         ],
       });

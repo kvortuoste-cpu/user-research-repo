@@ -10,6 +10,18 @@ export interface Project {
 
 export type Sentiment = "positive" | "negative" | "neutral" | "mixed";
 
+export type AttachmentKind = "video" | "audio" | "pdf" | "excel" | "csv" | "docx";
+
+export interface Attachment {
+  id: string;
+  name: string;
+  kind: AttachmentKind;
+  url: string;        // blob URL — survives the session but not a page reload
+  size: number;       // bytes
+  extractedText?: string;
+  htmlContent?: string; // mammoth HTML output for .docx preview
+}
+
 export interface ResearchSession {
   id?: number;
   projectId: number;
@@ -20,7 +32,9 @@ export interface ResearchSession {
   tags: string[];
   sentiment: Sentiment;
   participantInfo?: string;
+  /** @deprecated use attachments instead — kept for backwards compat with v1 data */
   videoUrl?: string;
+  attachments?: Attachment[];
   notes: string;
   createdAt: Date;
   updatedAt: Date;
@@ -42,6 +56,12 @@ export class ResearchDB extends Dexie {
   constructor() {
     super("ResearchRepositoryPOC");
     this.version(1).stores({
+      projects: "++id, createdAt",
+      sessions: "++id, projectId, createdAt, sentiment",
+      askAIMessages: "++id, projectId, createdAt",
+    });
+    // Version 2: adds attachments[] to sessions (non-indexed, no migration needed)
+    this.version(2).stores({
       projects: "++id, createdAt",
       sessions: "++id, projectId, createdAt, sentiment",
       askAIMessages: "++id, projectId, createdAt",
